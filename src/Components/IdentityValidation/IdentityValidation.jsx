@@ -30,37 +30,34 @@ export const IdentityValidation = () => {
 
   const handleSubmit = async () => {
     if (selectedFiles.length > 0) {
-      const formData = new FormData();
-
-      const promises = selectedFiles.map(file => readFileAsBase64(file));
-
-      Promise.all(promises)
-        .then(base64Images => {
-          base64Images.forEach((base64Image, index) => {
-            formData.append(`base64Image${index + 1}`, base64Image);
-          });
-
-          formData.append("partyId", partyId);
-          formData.append("sessionKey", sessionKey);
-          formData.append("dni", dni);
-          formData.append("imageName", imageName);
-
-          return fetch("/api/v1/kyc", {
+      selectedFiles.forEach(async (file) => {
+        const formData = new FormData();
+        const base64Image = await readFileAsBase64(file);
+        formData.append('base64Image', base64Image);
+        formData.append('partyId', partyId);
+        formData.append('sessionKey', sessionKey);
+        formData.append('dni', dni);
+        formData.append('imageName', imageName);
+  
+        try {
+          const response = await fetch("https://middlelayer-dev.betwarrior.com/api/v1/kyc", {
             method: "POST",
-            body: formData,
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(Object.fromEntries(formData)), // Convertir FormData a objeto y luego a JSON
           });
-        })
-        .then(response => {
+  
           if (response.ok) {
-            console.log("Archivos enviados con éxito a la API");
-            // Aquí puedes realizar cualquier otra acción después de enviar los archivos
+            console.log(`Imagen ${file.name} enviada con éxito a la API`);
+            // Aquí puedes realizar cualquier otra acción después de enviar la imagen
           } else {
-            console.error("Error al enviar los archivos a la API:", response.statusText);
+            console.error(`Error al enviar la imagen ${file.name} a la API:`, response.statusText);
           }
-        })
-        .catch(error => {
-          console.error("Error al enviar los archivos:", error.message);
-        });
+        } catch (error) {
+          console.error(`Error al enviar la imagen ${file.name}:`, error.message);
+        }
+      });
     } else {
       console.log("Debes seleccionar al menos un archivo.");
     }
