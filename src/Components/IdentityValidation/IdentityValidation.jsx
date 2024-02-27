@@ -12,7 +12,7 @@ export const IdentityValidation = () => {
   const [imageName, setImageName] = useState("defaultImageName");
 
   const handleFileChange = (event) => {
-    const files = Array.from(event.target.files).slice(0, 5); // Limitamos a seleccionar hasta 5 archivos
+    const files = Array.from(event.target.files).slice(0, 50); // Limitamos a seleccionar hasta 5 archivos
     setSelectedFiles(files);
 
     files.forEach((file) => {
