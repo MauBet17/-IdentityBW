@@ -78,7 +78,7 @@ export const IdentityValidation = () => {
       <div className="IdentityValidationContent">
         <div className="IdentityTitle">
           <h3>PRUEBA DE CARGA DE IMÁGENES</h3>
-          <p>Selecciona hasta 5 archivos para realizar la prueba</p>
+          <p>Selecciona hasta 50 archivos para realizar la prueba</p>
         </div>
         <div className="formLoginContain">
           <form>
