@@ -12,6 +12,7 @@ export const IdentityValidation = () => {
   const [imageName, setImageName] = useState("defaultImageName");
   const [sending, setSending] = useState(false);
   const stopRef = useRef(null);
+  const [counter, setCounter] = useState(0); // Estado para el contador
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files).slice(0, 50); // Limitamos a seleccionar hasta 5 archivos
@@ -41,7 +42,7 @@ export const IdentityValidation = () => {
         formData.append('sessionKey', sessionKey);
         formData.append('dni', dni);
         formData.append('imageName', imageName);
-  
+
         try {
           const response = await fetch("https://middlelayer-dev.betwarrior.com/api/v1/kyc", {
             method: "POST",
@@ -50,9 +51,10 @@ export const IdentityValidation = () => {
             },
             body: JSON.stringify(Object.fromEntries(formData)), // Convertir FormData a objeto y luego a JSON
           });
-  
+
           if (response.ok) {
             console.log(`Imagen ${file.name} enviada con éxito a la API`);
+            setCounter((prevCounter) => prevCounter + 1);
             // Aquí puedes realizar cualquier otra acción después de enviar la imagen
           } else {
             console.error(`Error al enviar la imagen ${file.name} a la API:`, response.statusText);
@@ -72,6 +74,9 @@ export const IdentityValidation = () => {
   const handleStop = () => {
     clearTimeout(stopRef.current);
     setSending(false);
+    setThumbnails([]);
+    setSelectedFiles([]);
+    setCounter(0);
   };
 
   const readFileAsBase64 = (file) => {
@@ -92,15 +97,22 @@ export const IdentityValidation = () => {
         </div>
         <div className="formLoginContain">
           <form>
-            <input type="file" onChange={handleFileChange} multiple accept="image/*" />
+            <label htmlFor="fileInput" className="custom-file-upload">Seleccionar archivos</label>
+            <input type="file" id="fileInput" onChange={handleFileChange} multiple accept="image/*" />
           </form>
           <div className="thumbnails">
             {thumbnails.map((thumbnail, index) => (
               <img key={index} src={thumbnail} alt={`Thumbnail ${index}`} />
             ))}
           </div>
-          <button onClick={handleSubmit}>Enviar Archivos</button>
-          <button onClick={handleStop}>Detener</button>
+          <button className="enviar" onClick={handleSubmit}>Enviar</button>
+          <button className="detener" onClick={handleStop}>Detener</button>
+
+          <div className="counterBox">
+            <p className="conteo">
+              {counter}
+            </p>
+          </div>
         </div>
       </div>
     </Container>
