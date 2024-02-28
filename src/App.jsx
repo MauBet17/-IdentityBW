@@ -11,8 +11,7 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
-        <Route exact path='/'element={< IdentityValidation  />} />
-
+        <Route exact path='/'element={< IdentityValidation  />} />      
     </Routes>
     </BrowserRouter>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Container } from "react-bootstrap";
 
 import "./IdentityValidation.css";
@@ -10,6 +10,8 @@ export const IdentityValidation = () => {
   const [sessionKey, setSessionKey] = useState("DSKJFHSKD15165132165DSFSF15S32F1DS5");
   const [dni, setDni] = useState(24587759);
   const [imageName, setImageName] = useState("defaultImageName");
+  const [sending, setSending] = useState(false);
+  const stopRef = useRef(null);
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files).slice(0, 50); // Limitamos a seleccionar hasta 5 archivos
@@ -29,7 +31,8 @@ export const IdentityValidation = () => {
   };
 
   const handleSubmit = async () => {
-    if (selectedFiles.length > 0) {
+    if (!sending && selectedFiles.length > 0) {
+      setSending(true);
       selectedFiles.forEach(async (file) => {
         const formData = new FormData();
         const base64Image = await readFileAsBase64(file);
@@ -58,9 +61,17 @@ export const IdentityValidation = () => {
           console.error(`Error al enviar la imagen ${file.name}:`, error.message);
         }
       });
+      stopRef.current = setTimeout(() => {
+        handleSubmit();
+      }, 1000);
     } else {
-      console.log("Debes seleccionar al menos un archivo.");
+      console.log("Debes seleccionar al menos un archivo o ya se está enviando la información.");
     }
+  };
+
+  const handleStop = () => {
+    clearTimeout(stopRef.current);
+    setSending(false);
   };
 
   const readFileAsBase64 = (file) => {
@@ -71,7 +82,6 @@ export const IdentityValidation = () => {
       reader.readAsDataURL(file);
     });
   };
-
 
   return (
     <Container fluid className="IdentityValidation">
@@ -90,9 +100,11 @@ export const IdentityValidation = () => {
             ))}
           </div>
           <button onClick={handleSubmit}>Enviar Archivos</button>
+          <button onClick={handleStop}>Detener</button>
         </div>
       </div>
     </Container>
   );
 };
+
 
